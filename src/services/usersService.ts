@@ -5,7 +5,8 @@ const users: IUser[] = []
 
 let id: number = 1;
 
-export const getUsersService = async () => {
+export const getUsersService = async (): Promise<IUser[]> => {
+    return users;
 }
 
 //creamos nuestra funcion para crear un usuario el cual es una funcion asincrona que recibe por parametros un objeto de tipo UserDto y retorna una promesa de tipo IUser
