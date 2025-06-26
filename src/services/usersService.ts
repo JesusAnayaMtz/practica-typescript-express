@@ -1,7 +1,7 @@
 import UserDto from "../dtos/UserDto";
 import IUser from "../interfaces/IUser"
 
-const users: IUser[] = []
+let users: IUser[] = []
 
 let id: number = 1;
 
@@ -25,6 +25,9 @@ export const createUserService = async (userData: UserDto): Promise<IUser>  => {
     return newUser;
 }
 
-export const deleteUserService = async () => {
-
+//Metodo para eliminar un usuario, el cual va recibir un id y filtrara para eliminarlo y nos retorna una promesa que no retorna nada
+export const deleteUserService = async (id: number): Promise<void> => {
+    users = users.filter((user: IUser) => {
+        return user.id !== id
+    })
 }

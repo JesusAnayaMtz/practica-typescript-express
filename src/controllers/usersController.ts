@@ -22,7 +22,9 @@ export const createUser = async (req:Request , res: Response) => {
     res.status(201).json(newUser);
 }
 
-//metodo para deliminar un usuario
-export const deleteUser = () => {
-
+//metodo para deliminar un usuario el cual por medio del cuerpo del json se le pasara el id y se eliminara el usuario con ese id
+export const deleteUser = async (req: Request, res:Response) => {
+    const {id} = req.body; //destruturamos el id del body
+    await deleteUserService(id); //eliminamos el usuario con el id que nos llega del body
+    res.status(200).json({message: "Usuario eliminado correctamente", id}); //retornamos un mensaje que el usuario se elimino correctamente y el id del usuario que se elimino
 }
