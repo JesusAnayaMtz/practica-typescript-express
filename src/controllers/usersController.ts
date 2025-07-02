@@ -15,9 +15,9 @@ export const getUsers = async (req: Request, res:Response) => {
 //en el controller de crear usuarios le pasamos por parametros req que es del tipo Request y res que es del tipo Response pero de express
 export const createUser = async (req:Request , res: Response) => {
     //destruturamos los datos del usuario que vienen del body
-    const {name, email, active} = req.body;
+    const {name, email,age, active} = req.body;
     //creamos un objeto del tipo IUser con los datos del body
-    const newUser: IUser = await createUserService({name, email, active});
+    const newUser: IUser = await createUserService({name, email, age, active});
     //retornamos el objeto creado con status 201 que es que se creo correctamente
     res.status(201).json(newUser);
 }

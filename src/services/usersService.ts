@@ -5,6 +5,7 @@ let users: IUser[] = [{
     id: 1,
     name: "Jose",
     email: "jose@example.com",
+    age: 35,
     active: true
 }]
 
@@ -21,6 +22,7 @@ export const createUserService = async (userData: UserDto): Promise<IUser>  => {
         id,
         name: userData.name,
         email: userData.email,
+        age:userData.age,
         active: userData.active
     }
     //agregarlo al arreglo de users
