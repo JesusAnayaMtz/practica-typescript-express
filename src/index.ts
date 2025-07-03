@@ -3,7 +3,7 @@ import { PORT } from "./config/envs"; //Importamos el puerto que viene del modul
 import "reflect-metadata"
 import { AppDataSource } from "./config/data-source";
 
-
+//Creamos una funcion asincrona que se encargue de inicializar la base de datos
 AppDataSource.initialize().then(res => {
     console.log("Conexion a la base de datos realizada con exito")
     server.listen(PORT,() => {

@@ -9,8 +9,10 @@ export const AppDataSource = new DataSource({
     password: "1989Iscj.",
     database: "demo_typeorm",
     synchronize: true,
-    logging: true,
+    logging: false,
     entities: [User],
     subscribers: [],
     migrations: [],
 })
+
+export const userModel = AppDataSource.getRepository(User);

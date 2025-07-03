@@ -1,40 +1,33 @@
+import {userModel } from "../config/data-source";
 import UserDto from "../dtos/UserDto";
+import { User } from "../entities/User";
 import IUser from "../interfaces/IUser"
 
-let users: IUser[] = [{
-    id: 1,
-    name: "Jose",
-    email: "jose@example.com",
-    age: 35,
-    active: true
-}]
 
 let id: number = 2;
-
-export const getUsersService = async (): Promise<IUser[]> => {
-    return users;
+//Cambia el retorno de la promesa a en vez de una interface nos regresa la entidad User
+export const getUsersService = async (): Promise<User[]> => {
+    //obtenemos todos los usuarios desde la base de datos usando typeorm
+     const users = await userModel.find(); 
+     return users;
 }
 
 //creamos nuestra funcion para crear un usuario el cual es una funcion asincrona que recibe por parametros un objeto de tipo UserDto y retorna una promesa de tipo IUser
-export const createUserService = async (userData: UserDto): Promise<IUser>  => {
-    //creamos un nuevo usuario del tipo IUser con los datos del objeto userData que es del tipo UserDto
-    const newUser: IUser = {
-        id,
-        name: userData.name,
-        email: userData.email,
-        age:userData.age,
-        active: userData.active
-    }
-    //agregarlo al arreglo de users
-    users.push(newUser);
-    id++;
-    //retornamos el objeto
-    return newUser;
+export const createUserService = async (userData: UserDto): Promise<User> => {
+    const user = await userModel.create(userData);
+    const userSave = await userModel.save(user)
+    return userSave;
 }
 
 //Metodo para eliminar un usuario, el cual va recibir un id y filtrara para eliminarlo y nos retorna una promesa que no retorna nada
 export const deleteUserService = async (id: number): Promise<void> => {
-    users = users.filter((user: IUser) => {
-        return user.id !== id
-    })
+    await userModel.delete(id);
+}
+
+export const getUserByIdService = async(id: number):Promise<User> => {
+    const user = await userModel.findOneBy({id});
+    if(!user) {
+        throw new Error("Usuario no encontrado")
+    }
+    return user;
 }

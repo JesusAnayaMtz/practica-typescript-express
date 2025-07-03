@@ -1,5 +1,5 @@
 import { Request, Response } from "express" //importamos los tipos Request y Response que vienen con express
-import { createUserService, getUsersService, deleteUserService } from "../services/usersService" //importamos los servicios de los usuarios que vienen de usersService.ts
+import { createUserService, getUsersService, deleteUserService, getUserByIdService } from "../services/usersService" //importamos los servicios de los usuarios que vienen de usersService.ts
 import IUser from "../interfaces/IUser"; //importamos la interfaz IUser que viene de IUser.ts para que el controller pueda usar los datos que vienen del body
 
 //creamos el metodo getusers para obtener los usuarios 
@@ -27,4 +27,14 @@ export const deleteUser = async (req: Request, res:Response) => {
     const {id} = req.body; //destruturamos el id del body
     await deleteUserService(id); //eliminamos el usuario con el id que nos llega del body
     res.status(200).json({message: "Usuario eliminado correctamente", id}); //retornamos un mensaje que el usuario se elimino correctamente y el id del usuario que se elimino
+}
+
+export const getUserById = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    try {
+        const user:IUser = await getUserByIdService(Number(id));
+        res.status(200).json(user)
+    } catch(error){
+        res.status(500).json({message: "Error al Obtener El Usuario"})
+    }
 }
