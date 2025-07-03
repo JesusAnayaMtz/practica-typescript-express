@@ -8,7 +8,11 @@ let id: number = 2;
 //Cambia el retorno de la promesa a en vez de una interface nos regresa la entidad User
 export const getUsersService = async (): Promise<User[]> => {
     //obtenemos todos los usuarios desde la base de datos usando typeorm
-     const users = await userModel.find(); 
+     const users = await userModel.find({
+        relations: {
+            vehicles: true
+        }
+     } ); 
      return users;
 }
 

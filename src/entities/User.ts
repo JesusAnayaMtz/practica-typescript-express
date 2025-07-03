@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Vehicle } from "./Vehicle"
 
 //Creamos nuestra clase
 //ahora debemos hacer pasar esta clase como un decorador
@@ -24,6 +25,16 @@ export class User {
 
     @Column()
     active: boolean
+
+    //relacionamos las tablas de user a vehicle esta seria de one to one
+    /* @OneToMany(() => Vehicle)
+    @JoinColumn()
+    vehicle: Vehicle */
+
+    //establecemos la relacion que un usuario puede tener varios vehicles pero debemos ir a nuestra clase veichle a configurar unos parametros
+    //para establecer la relacion en el vehicle que es muchos a one osea que varios vehiclos estan en un usuario
+    @OneToMany(() => Vehicle, (vehicle => vehicle.user))
+    vehicles: Vehicle[]
 }
 
 
