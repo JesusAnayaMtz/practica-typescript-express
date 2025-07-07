@@ -1,31 +1,32 @@
+import { DataSource } from "typeorm";
 import { AppDataSource, userModel, vehicleModel } from "../config/data-source";
 
 //creamos un arreglo de usuarios
 const preLoadUsers = [
     {
-    name: "Jesus",
-    email: "jesus@prueba.com",
-    age: 35,
-    active: true
-},
-{
-    name: "Jose",
-    email: "jose@prueba.com",
-    age: 30,
-    active: true
-},
-{
-    name: "Antonio",
-    email: "antonio@prueba.com",
-    age: 28,
-    active: true
-},
-{
-    name: "Marco",
-    email: "marcoesus@prueba.com",
-    age: 40,
-    active: true
-}
+        name: "Jesus",
+        email: "jesus@prueba.com",
+        age: 35,
+        active: true
+    },
+    {
+        name: "Jose",
+        email: "jose@prueba.com",
+        age: 30,
+        active: true
+    },
+    {
+        name: "Antonio",
+        email: "antonio@prueba.com",
+        age: 28,
+        active: true
+    },
+    {
+        name: "Marco",
+        email: "marcoesus@prueba.com",
+        age: 40,
+        active: true
+    }
 
 ]
 
@@ -42,74 +43,75 @@ const preLoadVehicles = [
         color: "Red",
         model: "Versa",
         year: 2021,
-        userId: 1
+        userId: 2
     },
     {
         brand: "Ford",
         color: "Gray",
         model: "Lobo",
         year: 2023,
-        userId: 5
+        userId: 3
     },
     {
         brand: "Chevrolet",
         color: "White",
         model: "Cavalier",
         year: 2020,
-        userId: 1
+        userId: 4
     }
 ]
 
 export const preloadUserData = async () => {
-//implementamos el appDataSource para trabajar con transacciones
-//el manager se encarga de manejar las transacciones
-//el transactionalEntityManager es el que se encarga de ejecutar las transacciones
-//siempre se debe usar el transactionalEntityManager para ejecutar las transacciones
-await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+    //implementamos el appDataSource para trabajar con transacciones
+    //el manager se encarga de manejar las transacciones
+    //el transactionalEntityManager es el que se encarga de ejecutar las transacciones
+    //siempre se debe usar el transactionalEntityManager para ejecutar las transacciones
+    await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
 
-    //primero vamos a validar que la base de datos este vacia usando el transactionalEntityManager
-    const users = await userModel.find();
-    if(users.length > 0){
-        console.log("La base de datos ya tiene datos");
-        return;
-    }
+        //primero vamos a validar que la base de datos este vacia usando el transactionalEntityManager
+        const users = await userModel.find();
+        if (users.length > 0) {
+            console.log("La base de datos ya tiene datos");
+            return;
+        }
 
-    //el for await nos permite esperar operaciones asincronas
-    //con este for creamos los usuarios que viene de nuestr arreglo de users
-    for await (const user of preLoadUsers){
-        const newUser = await userModel.create(user)
-        await transactionalEntityManager.save(newUser);
-    }
-    console.log("Precarga de datos de usuarios realizada con exito")
-})
+        //el for await nos permite esperar operaciones asincronas
+        //con este for creamos los usuarios que viene de nuestr arreglo de users
+        for await (const user of preLoadUsers) {
+            const newUser = await userModel.create(user)
+            await transactionalEntityManager.save(newUser);
+        }
+        console.log("Precarga de datos de usuarios realizada con exito")
+    })
 }
 
 //se genera otra funncion para precargar los vehiculos
 export const preloadVehiclesData = async () => {
-
-    const vehicles = await vehicleModel.find();
-    if(vehicles.length > 0){
-        console.log("La base de datos ya tiene datos de vehiculos");
-        return;
-    }
+    const queryRunner = AppDataSource.createQueryRunner(); // Crea un queryRunner
+    await queryRunner.connect(); // Conecta el queryRunner a la base de datos
+    await queryRunner.startTransaction(); // Iniciar la transacción antes de hacer cualquier operación
 
     try {
-        await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-        //Ahora hacemos el preload de vehiculos
-    for await (const vehicle of preLoadVehicles){
-        const newVehicle = await vehicleModel.create(vehicle);
-        await transactionalEntityManager.save(newVehicle)
-        const user = await userModel.findOneBy({id:vehicle.userId})
-        if(user) {
-            newVehicle.user = user;
-            transactionalEntityManager.save(newVehicle)
-        } else {
-            throw Error("Usuario Inexistente")
+        //ciclo for para precargar los vehiculos
+        for (const vehicle of preLoadVehicles) {
+            const user = await userModel.findOneBy({ id: vehicle.userId });
+            if (!user) {
+                throw new Error(`Usuario con ID ${vehicle.userId} no existe`);
+            }
+
+            //creamos el vehiculo
+            const newVehicle = vehicleModel.create(vehicle);
+            newVehicle.user = user; // Asociamos el usuario al vehiculo
+            await queryRunner.manager.save(newVehicle); // luego guardamos
         }
-    }
-    console.log("Precarga de datos de vehiculos realizada con exito")
-    })
-    } catch(error) {
-        console.log("Error al completar")
+
+        await queryRunner.commitTransaction(); // Confirmamos la transacción
+        console.log("Precarga de vehículos realizada con éxito");
+    } catch (error) {
+        console.error("Error al intentar crear los vehículos:", error);
+        await queryRunner.rollbackTransaction(); // Revertimos la transacción en caso de error
+    } finally {
+        await queryRunner.release(); // Liberamos el queryRunner
+        console.log("Finalizó el intento de la precarga");
     }
 }
