@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
     username: "postgres",
     password: "1989Iscj.",
     database: "demo_typeorm",
-    //dropSchema: true,  //sirve para eliminar limpiar la base de datos
+    dropSchema: true,  //sirve para eliminar limpiar la base de datos
     synchronize: true,
     logging: false,
     entities: [User, Vehicle],
