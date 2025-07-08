@@ -1,9 +1,11 @@
-import { vehicleModel, userModel, AppDataSource } from "../config/data-source"
+import {AppDataSource } from "../config/data-source"
+import VehicleRepository from "../repositories/VehicleRepository";
+import UserRepository from "../repositories/userRepository";
 import vehicleDto from "../dtos/vehicleDto";
 import { Vehicle } from "../entities/Vehicle";
 
 export const getVehiclesService = async (): Promise<Vehicle[]> => {
-    const vehicles = await vehicleModel.find({
+    const vehicles = await VehicleRepository.find({
         relations: {
             user: true
         }
@@ -18,10 +20,10 @@ export const createVehicleService = async (vehicle: vehicleDto): Promise<Vehicle
     try {
         queryRunner.startTransaction();
 
-        const newVehicle = await vehicleModel.create(vehicle);
+        const newVehicle = await VehicleRepository.create(vehicle);
         await queryRunner.manager.save(newVehicle);
 
-        const user = await userModel.findOneBy({ id: vehicle.userId })
+        const user = await UserRepository.findOneBy({ id: vehicle.userId })
         if (!user) {
             throw Error("Usuario inexistente: No se a podido crear el vehiculo")
         }

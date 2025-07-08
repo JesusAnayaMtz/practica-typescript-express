@@ -1,5 +1,7 @@
-import { DataSource } from "typeorm";
-import { AppDataSource, userModel, vehicleModel } from "../config/data-source";
+
+import { AppDataSource} from "../config/data-source";
+import UserRepository from "../repositories/userRepository";
+import VehicleRepository from "../repositories/VehicleRepository";
 
 //creamos un arreglo de usuarios
 const preLoadUsers = [
@@ -69,7 +71,7 @@ export const preloadUserData = async () => {
     await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
 
         //primero vamos a validar que la base de datos este vacia usando el transactionalEntityManager
-        const users = await userModel.find();
+        const users = await UserRepository.find();
         if (users.length > 0) {
             console.log("La base de datos ya tiene datos");
             return;
@@ -78,7 +80,7 @@ export const preloadUserData = async () => {
         //el for await nos permite esperar operaciones asincronas
         //con este for creamos los usuarios que viene de nuestr arreglo de users
         for await (const user of preLoadUsers) {
-            const newUser = await userModel.create(user)
+            const newUser = await UserRepository.create(user)
             await transactionalEntityManager.save(newUser);
         }
         console.log("Precarga de datos de usuarios realizada con exito")
@@ -94,13 +96,13 @@ export const preloadVehiclesData = async () => {
     try {
         //ciclo for para precargar los vehiculos
         for (const vehicle of preLoadVehicles) {
-            const user = await userModel.findOneBy({ id: vehicle.userId });
+            const user = await UserRepository.findOneBy({ id: vehicle.userId });
             if (!user) {
                 throw new Error(`Usuario con ID ${vehicle.userId} no existe`);
             }
 
             //creamos el vehiculo
-            const newVehicle = vehicleModel.create(vehicle);
+            const newVehicle = VehicleRepository.create(vehicle);
             newVehicle.user = user; // Asociamos el usuario al vehiculo
             await queryRunner.manager.save(newVehicle); // luego guardamos
         }
