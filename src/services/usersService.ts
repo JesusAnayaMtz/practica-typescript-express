@@ -1,8 +1,6 @@
-
-import UserRepository from "../repositories/userRepository";
+import UserRepository from "../repositories/UserRepository";
 import UserDto from "../dtos/UserDto";
 import { User } from "../entities/User";
-import IUser from "../interfaces/IUser"
 
 
 let id: number = 2;

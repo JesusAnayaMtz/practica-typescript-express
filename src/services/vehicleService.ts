@@ -1,6 +1,6 @@
 import {AppDataSource } from "../config/data-source"
 import VehicleRepository from "../repositories/VehicleRepository";
-import UserRepository from "../repositories/userRepository";
+import UserRepository from "../repositories/UserRepository";
 import vehicleDto from "../dtos/vehicleDto";
 import { Vehicle } from "../entities/Vehicle";
 
@@ -23,12 +23,11 @@ export const createVehicleService = async (vehicle: vehicleDto): Promise<Vehicle
         const newVehicle = await VehicleRepository.create(vehicle);
         await queryRunner.manager.save(newVehicle);
 
-        const user = await UserRepository.findOneBy({ id: vehicle.userId })
-        if (!user) {
-            throw Error("Usuario inexistente: No se a podido crear el vehiculo")
-        }
+        //Usamos nuestro metodo personalizado del user repository y asi no tenemos que espeificar que propiedad
+        const user = await UserRepository.findById(vehicle.userId);
 
         newVehicle.user = user;
+        
         await queryRunner.manager.save(newVehicle);
 
         await queryRunner.commitTransaction();

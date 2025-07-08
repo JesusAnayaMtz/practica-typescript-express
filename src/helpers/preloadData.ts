@@ -1,6 +1,6 @@
 
 import { AppDataSource} from "../config/data-source";
-import UserRepository from "../repositories/userRepository";
+import UserRepository from "../repositories/UserRepository";
 import VehicleRepository from "../repositories/VehicleRepository";
 
 //creamos un arreglo de usuarios

@@ -1,6 +1,5 @@
 import { Request, Response } from "express" 
 import { createVehicleService, getVehiclesService } from "../services/vehicleService";
-import { Vehicle } from "../entities/Vehicle";
 
 
 export const getVehicles = async (req: Request, res: Response) => {
@@ -17,6 +16,4 @@ export const createVehicle = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(400).json({error: "Error al crear el vehiculo"})
     }
-
-    
 }

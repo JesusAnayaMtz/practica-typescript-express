@@ -24,7 +24,7 @@ export class User {
     age: number
 
     @Column()
-    active: boolean
+    active: boolean;
 
     //relacionamos las tablas de user a vehicle esta seria de one to one
     /* @OneToMany(() => Vehicle)
